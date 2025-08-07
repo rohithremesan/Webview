@@ -1,4 +1,4 @@
-package com.example.webview
+package com.example.webview.ui.activity
 
 import android.graphics.Bitmap
 import android.os.Bundle
@@ -9,7 +9,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.webview.R
 import com.example.webview.databinding.ActivityMainBinding
+import com.example.webview.ui.fragment.BottomMenuFragment
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -24,6 +26,21 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        initalizeWebView()
+        clickListner()
+
+
+
+    }
+
+    private fun clickListner() {
+        binding.menuBtn.setOnClickListener {
+            val bottomsheet = BottomMenuFragment()
+            bottomsheet.show(supportFragmentManager,bottomsheet.tag)
+        }
+    }
+
+    private fun initalizeWebView() {
         binding.web.apply {
             webViewClient = object : WebViewClient() {
                 override fun onPageFinished(view: WebView?, url: String?) {
@@ -68,6 +85,5 @@ class MainActivity : AppCompatActivity() {
             settings.domStorageEnabled=true
             loadUrl("https://www.whatsapp.com/")
         }
-
     }
 }

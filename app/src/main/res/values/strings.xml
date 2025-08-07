@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Webview</string>
+    <string name="settings">SETTINGS</string>
+    <string name="home">HOME</string>
+    <string name="settings_clicked">Settings Clicked</string>
+    <string name="home_clicked">Home Clicked</string>
 </resources>
