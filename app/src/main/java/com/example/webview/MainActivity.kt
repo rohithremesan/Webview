@@ -2,6 +2,7 @@ package com.example.webview
 
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.view.View
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.enableEdgeToEdge
@@ -27,6 +28,7 @@ class MainActivity : AppCompatActivity() {
             webViewClient = object : WebViewClient() {
                 override fun onPageFinished(view: WebView?, url: String?) {
                     super.onPageFinished(view, url)
+                    binding.progressBar.visibility= View.GONE
 
                     if (url != null && (url.contains("facebook") || url.contains("instagram") || url.contains("x.com"))) {
                         view?.evaluateJavascript("""
@@ -52,6 +54,11 @@ class MainActivity : AppCompatActivity() {
 
             """.trimIndent(), null)
                     }
+                }
+
+                override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+                    super.onPageStarted(view, url, favicon)
+                    binding.progressBar.visibility= View.VISIBLE
                 }
 
 
