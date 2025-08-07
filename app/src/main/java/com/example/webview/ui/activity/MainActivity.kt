@@ -3,6 +3,8 @@ package com.example.webview.ui.activity
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.View
+import android.webkit.WebResourceError
+import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.enableEdgeToEdge
@@ -12,6 +14,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.webview.R
 import com.example.webview.databinding.ActivityMainBinding
 import com.example.webview.ui.fragment.BottomMenuFragment
+import com.example.webview.ui.utility.WebAppInterface
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -50,8 +53,16 @@ class MainActivity : AppCompatActivity() {
                     if (url != null && (url.contains("facebook") || url.contains("instagram") || url.contains("x.com"))) {
                         view?.evaluateJavascript("""
                (function() {
+                console.log('injected from Android');
+                document.documentElement.style.backgroundColor = '#e6f7ff';
+                document.body.style.backgroundColor = '#e6f7ff';
+
+                
+               if (document.getElementById('injectedMenu')) return;
+               
     let menu = document.createElement('div');
     menu.innerHTML = '☰';
+    menu.id = 'injectedMenu';
     menu.style.position = 'fixed';
     menu.style.bottom = '10px';
     menu.style.left = '30px';
@@ -66,7 +77,12 @@ class MainActivity : AppCompatActivity() {
     menu.style.display = 'flex';
     menu.style.alignItems = 'center';
     menu.style.justifyContent = 'center';
+    menu.onclick = function() {
+        AndroidInterface.onMenuClicked();
+    }
     document.body.appendChild(menu);
+    
+    
 })();
 
             """.trimIndent(), null)
@@ -79,11 +95,36 @@ class MainActivity : AppCompatActivity() {
                 }
 
 
-            }
+                override fun onReceivedError(
+                    view: WebView?,
+                    request: WebResourceRequest?,
+                    error: WebResourceError?
+                ) {
+                    binding.web.loadData(
+                        "<html><body><center><h2>Something went wrong.</h2><p>${error?.description}</p></center></body></html>",
+                        "text/html",
+                        "UTF-8"
+                    )
+                }
 
+
+            }
+            addJavascriptInterface(WebAppInterface(this@MainActivity, onClick = {
+                val bottomsheet = BottomMenuFragment()
+                bottomsheet.show(supportFragmentManager,bottomsheet.tag)
+            }),"AndroidInterface")
             settings.javaScriptEnabled = true
             settings.domStorageEnabled=true
             loadUrl("https://www.whatsapp.com/")
         }
     }
+
+    override fun onBackPressed() {
+        if (binding.web.canGoBack()) {
+            binding.web.goBack()
+        } else {
+            super.onBackPressed()
+        }
+    }
 }
+
